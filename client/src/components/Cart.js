@@ -21,7 +21,7 @@ const Cart = ({ cart, onCheckout }) => {
             {cart.map(item => {
               total += item.price * item.quantity
               return (
-                <tr key={item.productId}>
+                <tr role="row" key={item.productId}>
                   <td>{item.title}</td>
                   <td>{item.quantity}</td>
                   <td>{formatMoney(item.price)}</td>

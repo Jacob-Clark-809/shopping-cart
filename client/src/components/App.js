@@ -1,6 +1,7 @@
 import ProductList from "./ProductList"
 import AddProductForm from "./AddProductForm";
 import Header from "./Header";
+import productServices from "../services/product";
 import { useState } from "react";
 import { useEffect } from "react";
 
@@ -11,14 +12,7 @@ const App = () => {
 
   const handleNewProduct = async (product, callback) => {
     try {
-      const response = await fetch("/api/products", { 
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product) 
-      });
-      const addedProduct = await response.json();
+      const addedProduct = await productServices.newProduct(product);
       setProducts(products.concat(addedProduct));
       if (callback) {
         callback();
@@ -31,9 +25,8 @@ const App = () => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch("/api/products")
-        const product = await response.json()
-        setProducts(product);
+        const products = await productServices.getProducts();
+        setProducts(products);
       } catch(e) {
         console.log(e);
       }
@@ -43,9 +36,8 @@ const App = () => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch("/api/cart")
-        const cart = await response.json()
-        setCart(cart);
+        const cartItems = await productServices.getCartItems()
+        setCart(cartItems);
       } catch(e) {
         console.log(e);
       }
@@ -55,16 +47,8 @@ const App = () => {
   const handleAddToCart = async (id) => {
     const product = {productId: id};
     try {
-      const response = await fetch("/api/add-to-cart", { 
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product) 
-      });
-
-      let responseObject = await response.json()
-      cartItem = responseObject.item;
+      const responseObject = await productServices.addToCart(product);
+      const cartItem = responseObject.item;
 
       let newCart = [];
       if (cart.some(item => item.productId === cartItem.productId)) {
@@ -95,9 +79,7 @@ const App = () => {
 
   const handleCheckout = async () => {
     try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-      });
+      await productServices.checkout();
       setCart([]);
     } catch (e) {
       console.log(e);
@@ -106,14 +88,7 @@ const App = () => {
   
   const handleEditProduct = async (id, product, callback) => {
     try {
-      const response = await fetch(`/api/products/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product),
-      });
-      const updatedProduct = await response.json();
+      const updatedProduct = await productServices.editProduct(id, product);
       setProducts(products.map(product => {
         if (product._id === id) {
           return updatedProduct;
@@ -131,7 +106,7 @@ const App = () => {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`/api/products/${id}`, { method: "DELETE" });
+      await productServices.deleteProduct(id);
       setProducts(products.filter(product => product._id !== id));
     } catch (e) {
       console.log(e);
