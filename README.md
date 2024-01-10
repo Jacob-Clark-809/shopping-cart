@@ -1,5 +1,7 @@
 # Shopping Cart App
 
+Application for tracking items added to shopping cart. Includes express backend and react frontend.
+
 ## Setup
 
 1. Install [Node.js](https://nodejs.org/en/download/package-manager/) if you haven't already
